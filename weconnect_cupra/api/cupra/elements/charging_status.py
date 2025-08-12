@@ -1,3 +1,13 @@
+# -- HULPFUNCTIE: veilig naar float --
+def _to_float_veilig(value, fallback=0.0):
+    """Converteer naar float; vang None/'' en ongeldige waarden af met fallback."""
+    if value is None or value == '':
+        return fallback
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return fallback
+
 from enum import Enum
 import logging
 
@@ -45,7 +55,8 @@ class ChargingStatus(GenericStatus):
             self.chargeMode.fromDict(fromDict['value'], 'chargeMode')
             self.chargePower_kW.fromDict(fromDict['value'], 'chargePower_kW')
             if 'chargePower_kW' in fromDict['value']:
-                chargePower_kW = float(fromDict['value']['chargePower_kW'])
+                chargePower_kW = _to_float_veilig((fromDict or {}).get('value', {}).get('chargePower_kW'), fallback=0.0)
+self.chargePower_kW = chargePower_kW
                 if self.fixAPI and chargePower_kW != 0 \
                         and self.chargingState.value in [ChargingStatus.ChargingState.OFF,
                                                          ChargingStatus.ChargingState.READY_FOR_CHARGING,
